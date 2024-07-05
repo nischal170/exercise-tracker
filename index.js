@@ -112,6 +112,7 @@ try{
 
   let exercisesQuery = exercise.find(query, { __v: 0 });
 
+  
   if (limit) {
     exercisesQuery = exercisesQuery.limit(limit);
   }
