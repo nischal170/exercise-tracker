@@ -101,9 +101,27 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
 app.get('/api/users/:_id/logs', async (req, res) => {
 try{
   const userId=req.params._id;
-  const exercises = await exercise.find({userId}, { __v: 0 });
   const users = await User.findOne({ _id:userId }, { __v: 0 });
   const nameOfUser =users.username; 
+  const { from, to, limit } = req.query;
+
+    // Build query conditions
+    const query = { userId };
+    if (from || to) {
+      query.date = {};
+      if (from) {
+        query.date.$gte = new Date(from);
+      }
+      if (to) {
+        query.date.$lte = new Date(to);
+      }
+    }
+    // Query exercises with optional limit
+    let exercisesQuery = await exercise.find(query, { __v: 0 }).sort({ date: 'desc' });
+    if (limit) {
+      exercisesQuery = exercisesQuery.limit(parseInt(limit));
+    }
+    const exercises = await exercisesQuery.exec();
 
   res.status(200).json({
     id:userId,
