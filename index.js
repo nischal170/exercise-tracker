@@ -99,11 +99,9 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
 });
 
 app.get('/api/users/:_id/logs', async (req, res) => {
-try{
-  const userId=req.params._id;
-  const users = await User.findOne({ _id:userId }, { __v: 0 });
-  const nameOfUser =users.username; 
-  const { from, to, limit } = req.query;
+  try {
+    const userId = req.params._id;
+    const { from, to, limit } = req.query;
 
     // Build query conditions
     const query = { userId };
@@ -116,31 +114,31 @@ try{
         query.date.$lte = new Date(to);
       }
     }
+
     // Query exercises with optional limit
-    let exercisesQuery = await exercise.find(query, { __v: 0 }).sort({ date: 'desc' });
+    let exercisesQuery = exercise.find(query, { __v: 0 }).sort({ date: 'desc' });
     if (limit) {
       exercisesQuery = exercisesQuery.limit(parseInt(limit));
     }
     const exercises = await exercisesQuery.exec();
 
-  res.status(200).json({
-    id:userId,
-    username:nameOfUser,
-    count:exercises.length,
-    log: exercises.map(exercise => ({
-      description: exercise.description,
-      duration: exercise.duration,
-      date: exercise.date.toDateString()  
-    }))
+    
+    const user = await User.findOne({ _id: userId }, { __v: 0 });
+    const nameOfUser = user.username ;
 
-  });
-
-
-}
-catch (err) {
-  res.status(500).json({ error: err.message });
-
-}
+    res.status(200).json({
+      id: userId,
+      username: nameOfUser,
+      count: exercises.length,
+      log: exercises.map(exercise => ({
+        description: exercise.description,
+        duration: exercise.duration,
+        date: exercise.date.toDateString()
+      }))
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 
