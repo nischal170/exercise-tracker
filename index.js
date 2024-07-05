@@ -102,7 +102,12 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
 app.get('/api/users/:_id/logs', async (req, res) => {
 try{
   const userId=req.params._id;
-  const exercises = await exercise.find({userId}, { __v: 0 });
+  const {from,to,limit}=req.query;
+  const exercises = await exercise.find(
+    { userId, date: { $gte: from, $lte: to } }, 
+    { __v: 0 }
+  ).limit(limit);
+  console.log(from,to,limit);
   const users = await User.findOne({ _id:userId }, { __v: 0 });
   const nameOfUser =users.username; 
 
