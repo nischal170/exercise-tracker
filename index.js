@@ -62,6 +62,8 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
     const id=req.params._id;
     const { description, date } = req.body; //object destructuring
     const duration = parseInt(req.body.duration);
+    const users = await User.findOne({ _id:id }, { __v: 0 });
+    const nameOfUser =users.username; 
      // Validate required fields
      if (!description || !duration) {
       return res.status(400).json({ error: 'Description and Duration are required' });
@@ -81,10 +83,12 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
     const savedExercise = await newExercise.save();
 
     res.status(201).json({
-      userId: savedExercise.userId,
-      description: savedExercise.description,
+      _id: savedExercise.userId,
+      username:nameOfUser,
+      date: savedExercise.date.toDateString(),
       duration: savedExercise.duration,
-      date: savedExercise.date.toDateString()
+      description: savedExercise.description
+      
     });
 
   }
