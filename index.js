@@ -107,7 +107,6 @@ try{
     { userId, date: { $gte: from, $lte: to } }, 
     { __v: 0 }
   ).limit(limit);
-  console.log(from,to,limit);
   const users = await User.findOne({ _id:userId }, { __v: 0 });
   const nameOfUser =users.username; 
 
